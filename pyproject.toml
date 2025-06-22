@@ -16,6 +16,7 @@ dependencies = [
 
 [tool.uv]
 package = true
+default-groups = []
 
 [build-system]
 requires = ["hatchling"]

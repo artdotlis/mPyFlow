@@ -14,13 +14,13 @@ dev: setup
 	$(UVE) run lefthook install
 
 tests: setup
-	$(UVE) sync --frozen --no-group docs --no-group dev
+	$(UVE) sync --frozen --group test
 
 build: setup
-	$(UVE) sync --frozen --no-group test --no-group docs --no-group dev
+	$(UVE) sync --frozen
 
 docs: setup
-	$(UVE) sync --frozen --no-group test --no-group dev
+	$(UVE) sync --frozen --group docs
 
 setup:
 	git lfs install || echo '[FAIL] git-lfs could not be installed'

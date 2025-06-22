@@ -1,5 +1,5 @@
 # mPyFlow
 
-::: mPyFlow
+::: mpyflow
     options:
         show_submodules: true

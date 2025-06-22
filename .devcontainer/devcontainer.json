@@ -1,0 +1,16 @@
+{
+  "customizations": {},
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "dev.docker-compose.yml"
+  ],
+  "name": "mPyFlow",
+  "remoteUser": "devu",
+  "runServices": [
+    "dev"
+  ],
+  "service": "dev",
+  "shutdownAction": "stopCompose",
+  "updateRemoteUserUID": true,
+  "workspaceFolder": "/workspace"
+}

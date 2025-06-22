@@ -20,7 +20,7 @@ build: setup
 	$(UVE) sync --frozen --no-group test --no-group docs --no-group dev
 
 docs: setup
-	$(UVE) sync --froze --no-group test --no-group dev
+	$(UVE) sync --frozen --no-group test --no-group dev
 
 setup:
 	git lfs install || echo '[FAIL] git-lfs could not be installed'

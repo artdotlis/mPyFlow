@@ -41,7 +41,16 @@ async def _await_job(queue: asyncio.Queue[Any], event: asyncio.Event, /) -> None
 
 @final
 class Worker[IN, OT]:
-    __slots__ = ("__error", "__evq", "__hub", "__name", "__sha", "__syo", "__wm")
+    __slots__ = (
+        "__error",
+        "__evq",
+        "__hub",
+        "__name",
+        "__print_size",
+        "__sha",
+        "__syo",
+        "__wm",
+    )
 
     def __init__(
         self,
@@ -49,6 +58,7 @@ class Worker[IN, OT]:
         workable_in: tuple[Workable[IN, OT], ...],
         workable_out: tuple[Workable[OT, Any], ...],
         hub: bool = False,
+        print_size: int = 10000,
         /,
     ) -> None:
         super().__init__()
@@ -59,6 +69,7 @@ class Worker[IN, OT]:
         self.__evq: _EventQueues[IN, OT] | None = None
         self.__error: bool = False
         self.__hub = hub
+        self.__print_size = print_size if print_size > 1 else 1
 
     def register_worker(self, sync_out: SyncStdoutInterface, /) -> None:
         self.__wm.provider_process_started()
@@ -127,11 +138,12 @@ class Worker[IN, OT]:
             self.__wm.provider_process_stopped()
 
     def __print_con(self, p_name: str, p_typ: str, cnt: int, /) -> None:
-        msg = (
-            f"{p_name} process_{p_typ} {self.name} "
-            + f"workable_running, {cnt!s}-th element!"
-        )
-        self.sync_out.print_message(self.name, msg, 0.0, False)
+        if cnt % self.__print_size == 0:
+            msg = (
+                f"{p_name} process_{p_typ} {self.name} "
+                + f"workable_running, {cnt!s}-th element!"
+            )
+            self.sync_out.print_message(self.name, msg, 0.0, False)
 
     async def __read(
         self, p_name: str, rpl: list[int], re_cnt: int, lac: int, reader_len: int, /

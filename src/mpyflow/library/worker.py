@@ -237,6 +237,8 @@ class Worker[IN, OT]:
                 await self.__write_to_all(erg, writer_len)
             else:
                 await self.__write_to_one(erg, wpl, writer_len)
+        else:
+            self.evq.worker_queue.task_done()
 
     async def __writer(self, p_name: str, /) -> int:
         counter_write = 0

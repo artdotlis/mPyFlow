@@ -11,7 +11,7 @@ from mpyflow.shared.interfaces.io import IOInterface
 from mpyflow.shared.interfaces.logger import SyncStdoutInterface
 from mpyflow.shared.interfaces.work import WorkInterface
 from multiprocessing import synchronize
-from typing import final, AsyncIterator
+from typing import Any, final, AsyncIterator
 
 
 @final
@@ -90,7 +90,7 @@ class Workable[IN, OT]:
         self,
         ctx: multiprocessing.context.SpawnContext,
         work_instance: WorkInterface[IN, OT],
-        io_instance: IOInterface[IN, OT],
+        io_instance: IOInterface[IN, Any],
         /,
     ) -> None:
         super().__init__()

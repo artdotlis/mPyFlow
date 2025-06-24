@@ -11,7 +11,7 @@ from mpyflow.shared.interfaces.io import IOInterface
 from mpyflow.shared.interfaces.logger import SyncStdoutInterface
 from mpyflow.shared.interfaces.work import WorkInterface
 from multiprocessing import synchronize
-from typing import Any, final, AsyncIterator
+from typing import final, AsyncIterator
 
 
 @final
@@ -90,13 +90,13 @@ class Workable[IN, OT]:
         self,
         ctx: multiprocessing.context.SpawnContext,
         work_instance: WorkInterface[IN, OT],
-        io_instance: IOInterface[IN, Any],
+        io_instance: IOInterface[IN],
         /,
     ) -> None:
         super().__init__()
         self.__sync_out: SyncStdoutInterface | None = None
         self.__work_obj: WorkInterface[IN, OT] = work_instance
-        self.__io_obj: IOInterface[IN, OT] = io_instance
+        self.__io_obj: IOInterface[IN] = io_instance
         self.__io_progress: IOProgress = IOProgress(ctx)
         self.__thp: ThreadPoolExecutor | None = None
         self.__gl_lock = ctx.Condition()
@@ -170,7 +170,7 @@ class Workable[IN, OT]:
         async with self.__as_lock.reader_async:
             return await self.__io_obj.read(self.thp)
 
-    async def workable_write(self, data: OT, /) -> bool:
+    async def workable_write(self, data: IN, /) -> bool:
         if self.__io_progress.end_type.error == 1 or self.sync_out.error_occurred():
             raise WorkableEx("Workable error was set!")
         if not self.__io_obj.has_output():

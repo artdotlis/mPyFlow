@@ -173,10 +173,9 @@ class Worker[IN, OT]:
     async def __work(self, erg: tuple[int, IN], /) -> None:
         self.evq.reader_queue.task_done()
         ind, data = erg
-        async for list_worked in self.__wm.workable_in[ind].workable_work(data):
-            if sum(len(list_elem) for list_elem in list_worked):
-                await _await_job(self.evq.worker_queue, self.evq.stop_event_error)
-                await self.evq.worker_queue.put(list_worked)
+        async for worked in self.__wm.workable_in[ind].workable_work(data):
+            await _await_job(self.evq.worker_queue, self.evq.stop_event_error)
+            await self.evq.worker_queue.put(worked)
             if self.evq.stop_event_error.is_set():
                 break
 

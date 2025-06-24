@@ -47,7 +47,7 @@ class Worker[IN, OT]:
         self,
         name: str,
         workable_in: tuple[Workable[IN, OT], ...],
-        workable_out: tuple[Workable[Any, OT], ...],
+        workable_out: tuple[Workable[OT, Any], ...],
         hub: bool = False,
         /,
     ) -> None:

@@ -3,7 +3,7 @@ from mpyflow.shared.container.data import InputData
 from typing import Protocol
 
 
-class IOInterface[IN, OT](Protocol):
+class IOInterface[IN](Protocol):
 
     def has_input(self) -> bool: ...
 
@@ -15,7 +15,7 @@ class IOInterface[IN, OT](Protocol):
 
     async def read(self, thread_pool: ThreadPoolExecutor, /) -> InputData[IN] | None: ...
 
-    async def write(self, data: OT, thread_pool: ThreadPoolExecutor, /) -> bool: ...
+    async def write(self, data: IN, thread_pool: ThreadPoolExecutor, /) -> bool: ...
 
     async def running(
         self, thread_pool: ThreadPoolExecutor, provider_cnt: int, /

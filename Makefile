@@ -3,10 +3,10 @@ ROOT_MAKEFILE:=$(abspath $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE
 include $(ROOT_MAKEFILE)/.env
 
 export
+export PATH := $(PATH):$(shell pwd)/$(UV_INSTALL_DIR)
 
 $(eval UVEL := $(shell which uv && echo "true" || echo ""))
 UVE = $(if ${UVEL},'uv',$(UV_INSTALL_DIR)/uv)
-UV_ENV := $(UV_INSTALL_DIR)/env
 
 dev: setup
 	$(UVE) sync --frozen --all-groups
@@ -34,7 +34,7 @@ setup:
 RAN := $(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 
 runAct:
-	echo "source .venv/bin/activate; source $(UV_ENV); rm /tmp/$(RAN)" > /tmp/$(RAN)
+	echo "source .venv/bin/activate; rm /tmp/$(RAN)" > /tmp/$(RAN)
 	bash --init-file /tmp/$(RAN)
 
 runChecks:

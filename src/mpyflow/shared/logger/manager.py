@@ -251,8 +251,8 @@ def _print_status(manager: LogManager, /) -> str:
 
 
 def _p2c(manager: LogManager, message: SyncOutMsg, console: Console, /) -> None:
+    _check_message(message)
     with manager.manager_lock:
-        _check_message(message)
         new_act_object = manager.sync_object_manager.managed_dict.get(message.s_id, None)
         if new_act_object is not None:
             _check_object_status(message, new_act_object)
@@ -260,9 +260,9 @@ def _p2c(manager: LogManager, message: SyncOutMsg, console: Console, /) -> None:
         if message.done:
             manager.manager_done_counter.value += 1
         manager.sync_object_manager.managed_dict[message.s_id] = new_act_object
-        if len(message.msg) > 5:
-            console.log(message.msg)
-            time.sleep(1)
+    if len(message.msg) > 5:
+        console.log(message.msg)
+        time.sleep(1)
 
 
 def _waiting_output_str(manager: LogManager, /) -> None:

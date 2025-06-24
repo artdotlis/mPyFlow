@@ -46,7 +46,7 @@ class Worker[IN, OT]:
     def __init__(
         self,
         name: str,
-        workable_in: tuple[Workable[IN, Any], ...],
+        workable_in: tuple[Workable[IN, OT], ...],
         workable_out: tuple[Workable[Any, OT], ...],
         hub: bool = False,
         /,

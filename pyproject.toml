@@ -145,28 +145,27 @@ commands = [
     "coverage",
     "erase",
   ],
-#  [
-#    "coverage",
-#    "run",
-#    "--parallel-mode",
-#    "-m",
-#    "pytest",
-#    "{posargs}",
-#  ],
-#  [
-#    "coverage",
-#    "combine",
-#  ],
-#  [
-#    "coverage",
-#    "report",
-#  ],
+  [
+    "coverage",
+    "run",
+    "--parallel-mode",
+    "-m",
+    "pytest",
+    "{posargs}",
+  ],
+  [
+    "coverage",
+    "combine",
+  ],
+  [
+    "coverage",
+    "report",
+ ],
 ]
 
 [tool.coverage.run]
 source = [
-  "pkg1",
-  "shared_utils"
+  "src"
 ]
 parallel = true
 

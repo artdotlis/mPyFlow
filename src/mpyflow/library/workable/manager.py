@@ -10,16 +10,16 @@ class WorkableManager[IN, OT]:
 
     def __init__(
         self,
-        workable_in: tuple[Workable[IN, Any], ...],
-        workable_out: tuple[Workable[Any, OT], ...],
+        workable_in: tuple[Workable[IN, OT], ...],
+        workable_out: tuple[Workable[OT, Any], ...],
         /,
     ) -> None:
         super().__init__()
-        self.__read_from: tuple[Workable[IN, Any], ...] = workable_in
-        self.__write_to: tuple[Workable[Any, OT], ...] = workable_out
+        self.__read_from: tuple[Workable[IN, OT], ...] = workable_in
+        self.__write_to: tuple[Workable[OT, Any], ...] = workable_out
 
     @property
-    def workable_in(self) -> tuple[Workable[IN, Any], ...]:
+    def workable_in(self) -> tuple[Workable[IN, OT], ...]:
         return self.__read_from
 
     @property

@@ -1,7 +1,3 @@
-import atexit
-
-from rich.status import Status
-
 import json
 from io import TextIOWrapper
 
@@ -186,15 +182,11 @@ class _EndConD:
     flush_log: ValueP[int]
 
 
-def _print_at_exit(output_stream: TextIOWrapper | None, sta: Status, /) -> None:
+def _print_at_exit(output_stream: TextIOWrapper | None, /) -> None:
     if output_stream is not None:
         output_stream.write("\n")
         output_stream.flush()
         output_stream.close()
-    try:
-        sta.__exit__(None, None, None)
-    except ValueError:
-        pass
 
 
 def _prog_bar_calc(count: int, prog: float, /) -> str:
@@ -242,99 +234,70 @@ class _RichCast:
         return self.__formatter()
 
 
-@final
-class _SysOutPrinter:
-    __slots__ = ("__console", "__log_manager")
-
-    def __init__(self, manager: LogManager, /) -> None:
-        super().__init__()
-        self.__console = Console(log_path=False)
-        sta = self.__console.status(_RichCast(lambda: self.__print_status()))
-        sta.__enter__()
-        atexit.register(lambda: _print_at_exit(sys.__stdout__, sta))
-        self.__log_manager = manager
-
-    def __print_status(self) -> str:
-        uptime_loc = self.__log_manager.wa_process_attributes.started
-        with self.__log_manager.manager_lock:
-            act_obj = len(self.__log_manager.sync_object_manager.managed_dict)
-            if act_obj > 0:
-                mana = self.__log_manager.sync_object_manager.managed_dict
-                gen = (elem[0] for elem in mana.values())
-                prog: float = reduce((lambda x, y: x + y), gen) / (10 * act_obj)
-            else:
-                prog = 0.0
-            msg_st = _format_global_status(
-                act_obj, self.__log_manager.manager_done_counter.value, uptime_loc, prog
-            )
-            return f"[bold green]{msg_st}"
-
-    def print_to_console(self, message: SyncOutMsg, /) -> None:
-        with self.__log_manager.manager_lock:
-            _check_message(message)
-            new_act_object = self.__log_manager.sync_object_manager.managed_dict.get(
-                message.s_id, None
-            )
-            if new_act_object is not None:
-                _check_object_status(message, new_act_object)
-            new_act_object = (message.status, message.done)
-            if message.done:
-                self.__log_manager.manager_done_counter.value += 1
-            self.__log_manager.sync_object_manager.managed_dict[message.s_id] = (
-                new_act_object
-            )
-
-            for msg in message.msg.split("\n"):
-                if msg == "":
-                    continue
-                self.__console.log(msg)
-
-
-def _print_empty(
-    printer: _SysOutPrinter, pid_cur: int | None, manager: LogManager, /
-) -> None:
-    printer.print_to_console(
-        SyncOutMsg(
-            s_id=f"_OutputWaitingProcess_{pid_cur!s}_{manager.id_cnt!s}",
-            msg="",
-            status=0.0,
-            done=False,
+def _print_status(manager: LogManager, /) -> str:
+    uptime_loc = manager.wa_process_attributes.started
+    with manager.manager_lock:
+        act_obj = len(manager.sync_object_manager.managed_dict)
+        if act_obj > 0:
+            mana = manager.sync_object_manager.managed_dict
+            gen = (elem[0] for elem in mana.values())
+            prog: float = reduce((lambda x, y: x + y), gen) / (10 * act_obj)
+        else:
+            prog = 0.0
+        msg_st = _format_global_status(
+            act_obj, manager.manager_done_counter.value, uptime_loc, prog
         )
-    )
+        return f"[bold green]{msg_st}"
+
+
+def _p2c(manager: LogManager, message: SyncOutMsg, console: Console, /) -> None:
+    with manager.manager_lock:
+        _check_message(message)
+        new_act_object = manager.sync_object_manager.managed_dict.get(message.s_id, None)
+        if new_act_object is not None:
+            _check_object_status(message, new_act_object)
+        new_act_object = (message.status, message.done)
+        if message.done:
+            manager.manager_done_counter.value += 1
+        manager.sync_object_manager.managed_dict[message.s_id] = new_act_object
+        if len(message.msg) > 5:
+            console.log(message.msg)
+            time.sleep(1)
 
 
 def _waiting_output_str(manager: LogManager, /) -> None:
     pid_cur = current_process().pid
     running = True
-    printer = _SysOutPrinter(manager)
-    _print_empty(printer, pid_cur, manager)
-    try:
-        while running:
-            try:
-                erg = manager.get_from_queue()
-            except queue.Empty:
-                _print_empty(printer, pid_cur, manager)
-            else:
-                printer.print_to_console(erg)
-            running = manager.run or not manager.queue_empty
-        out_msg = r"_OutputWaitingProcess \[done]"
-        act_obj = len(manager.sync_object_manager.managed_dict) - 1
-        act_obj -= manager.manager_done_counter.value
-        if act_obj > 0:
-            out_msg = f"{out_msg} unfinished objects: {act_obj}"
-        printer.print_to_console(
-            SyncOutMsg(
-                s_id=f"_OutputWaitingProcess_{pid_cur!s}_{manager.id_cnt!s}",
-                msg=out_msg,
-                status=100.0,
-                done=True,
-            )
-        )
-    except Exception:
-        manager.set_manager_error()
-        raise
-    finally:
-        manager.zero_status()
+    cons = Console(log_path=False)
+    with cons.status(_RichCast(lambda: _print_status(manager))):
+        s_id = f"_OutputWaitingProcess_{pid_cur!s}_{manager.id_cnt!s}"
+        sync = SyncOutMsg(s_id=s_id, msg="", status=0.0, done=False)
+        _p2c(manager, sync, cons)
+        try:
+            while running:
+                try:
+                    erg = manager.get_from_queue()
+                except queue.Empty:
+                    s_id = f"_OutputWaitingProcess_{pid_cur!s}_{manager.id_cnt!s}"
+                    sync = SyncOutMsg(s_id=s_id, msg="", status=0.0, done=False)
+                    _p2c(manager, sync, cons)
+                else:
+                    _p2c(manager, erg, cons)
+                running = manager.run or not manager.queue_empty
+            out_msg = r"_OutputWaitingProcess \[done]"
+            act_obj = len(manager.sync_object_manager.managed_dict) - 1
+            act_obj -= manager.manager_done_counter.value
+            if act_obj > 0:
+                out_msg = f"{out_msg} unfinished objects: {act_obj}"
+            s_id = f"_OutputWaitingProcess_{pid_cur!s}_{manager.id_cnt!s}"
+            sync = SyncOutMsg(s_id=s_id, msg=out_msg, status=100.0, done=True)
+            _p2c(manager, sync, cons)
+        except Exception:
+            manager.set_manager_error()
+            raise
+        finally:
+            manager.zero_status()
+    _print_at_exit(sys.__stdout__)
 
 
 def _logger_process(

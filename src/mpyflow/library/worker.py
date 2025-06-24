@@ -56,12 +56,14 @@ class Worker[IN, OT]:
         self,
         name: str,
         workable_in: tuple[Workable[IN, OT], ...],
-        workable_out: tuple[Workable[OT, Any], ...],
+        workable_out: tuple[Workable[OT, Any], ...] = tuple(),
         hub: bool = False,
         print_size: int = 10000,
         /,
     ) -> None:
         super().__init__()
+        if len(workable_in) == 0:
+            raise WorkerEx("At least one workable must be defined as input!")
         self.__name = name
         self.__syo: SyncStdoutInterface | None = None
         self.__sha: RedirectSysHandler | None = None
@@ -229,6 +231,13 @@ class Worker[IN, OT]:
             pointers.remove(local_pointer)
         self.evq.worker_queue.task_done()
 
+    async def __write(self, erg: OT, wpl: list[int], writer_len: int, /) -> None:
+        if len(self.__wm.workable_out) > 0:
+            if self.__hub:
+                await self.__write_to_all(erg, writer_len)
+            else:
+                await self.__write_to_one(erg, wpl, writer_len)
+
     async def __writer(self, p_name: str, /) -> int:
         counter_write = 0
         wpl: list[int] = []
@@ -247,10 +256,8 @@ class Worker[IN, OT]:
                 else:
                     counter_write += 1
                     self.__print_con(p_name, f"write_hub_{self.__hub}", counter_write)
-                    if self.__hub:
-                        await self.__write_to_all(erg, writer_len)
-                    else:
-                        await self.__write_to_one(erg, wpl, writer_len)
+                    await self.__write(erg, wpl, writer_len)
+
         except Exception:
             self.evq.stop_event_error.set()
             raise

@@ -86,7 +86,7 @@ def _check_run(
 
 
 @final
-class SyncQueue[IN, OT]:
+class SyncQueue[IN]:
     __slots__ = (
         "__buffer_structure",
         "__de_ser",
@@ -101,7 +101,7 @@ class SyncQueue[IN, OT]:
         self,
         ctx: multiprocessing.context.SpawnContext,
         puffer_size: int,
-        serializer: Callable[[OT], bytes],
+        serializer: Callable[[IN], bytes],
         deserializer: Callable[[bytes], IN],
         /,
     ) -> None:
@@ -145,7 +145,7 @@ class SyncQueue[IN, OT]:
             return None
         return InputData(self.__de_ser(values_bytes))
 
-    async def write(self, data: OT, th_exec: ThreadPoolExecutor, /) -> bool:
+    async def write(self, data: IN, th_exec: ThreadPoolExecutor, /) -> bool:
         erg_write = await asyncio.get_event_loop().run_in_executor(
             th_exec,
             remove_all_args(

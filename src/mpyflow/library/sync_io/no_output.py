@@ -26,8 +26,7 @@ class NoOutputSink:
     async def read(self, _th_exc: ThreadPoolExecutor, /) -> Any:
         raise NotImplementedError("Not implemented")
 
-    async def write(self, data: Any, _th_exc: ThreadPoolExecutor, /) -> bool:
-        print(f"thrown away: {data!s}")
+    async def write(self, _data: Any, _th_exc: ThreadPoolExecutor, /) -> bool:
         return False
 
     async def running(self, _th_exc: ThreadPoolExecutor, _provider_cnt: int, /) -> bool:

@@ -1,8 +1,7 @@
 {
   "customizations": {},
   "dockerComposeFile": [
-    "../docker-compose.yml",
-    "dev.docker-compose.yml"
+    "../dev.docker-compose.yml"
   ],
   "name": "mPyFlow",
   "remoteUser": "devu",

@@ -1,3 +1,9 @@
+ifeq ($(CONTAINER),container)
+$(info Makefile enabled, proceeding ...)
+else
+$(error Error: Makefile disabled, exiting ...)
+endif
+
 ROOT_MAKEFILE:=$(abspath $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 
 include $(ROOT_MAKEFILE)/.env
@@ -10,7 +16,7 @@ UVE = $(if ${UVEL},'uv',$(UV_INSTALL_DIR)/uv)
 
 dev: setup
 	$(UVE) sync --frozen --all-groups
-	$(UVE) run lefthook uninstall 2>&1
+	$(UVE) run lefthook uninstall 2>&1 || echo "not installed"
 	$(UVE) run lefthook install
 
 tests: setup
@@ -24,11 +30,11 @@ docs: setup
 
 setup:
 	git lfs install || echo '[FAIL] git-lfs could not be installed'
-	which uv || [ -d "${UV_INSTALL_DIR}" ] || (curl -LsSf https://astral.sh/uv/install.sh | sh)
-	which uv || $(UVE) python install $(PYV)
+	which uv || [ -d "${UV_INSTALL_DIR}" ] || (curl -LsSf https://astral.sh/uv/install.sh | sh -s - --quiet)
+	$(UVE) python install $(PYV)
 	rm -rf .venv
 	$(UVE) venv --python=$(PYV) --relocatable --link-mode=copy --seed
-	which uv || $(UVE) pip install --upgrade pip
+	$(UVE) pip install --upgrade pip
 
 
 RAN := $(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')

@@ -59,9 +59,9 @@ runBuild:
 	$(UVE) build
 
 runBump:
-	cz bump --files-only --yes --changelog
+	$(UVE) run cz bump --files-only --yes --changelog
 	git add .
-	cz version --project | xargs -i git commit -am "bump: release {}"
+	$(UVE) run cz version --project | xargs -i git commit -am "bump: release {}"
 
 runUV:
 	$(UVE) run $(CMD)

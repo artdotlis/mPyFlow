@@ -8,8 +8,6 @@ pre-commit:
       group:
         parallel: true
         jobs:
-          - name: tox
-            run: tox
           - name: mypy
             glob: "*.py"
             run: mypy {staged_files}
@@ -86,3 +84,8 @@ commit-msg:
   commands:
     commitizen:
       run: cat {1} | cz check
+pre-push:
+  piped: true
+  commands:
+    tests:
+      run: "tox"

@@ -20,7 +20,7 @@ jobs:
       - name: Get version from pyproject.toml
         id: get_version
         run: |
-          VERSION=$(grep '^version' pyproject.toml | cut -d '"' -f2)
+          VERSION=$(grep '^version\s*=' pyproject.toml | cut -d '"' -f2)
           echo "Detected version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 

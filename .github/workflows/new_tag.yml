@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -25,12 +25,11 @@ jobs:
           VERSION=$(grep '^version =' pyproject.toml | cut -d '"' -f2)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Get previous version from main~1
+      - name: Get previous version from last main ancestor
         id: previous
         run: |
-          git checkout HEAD~1
-          PREV_VERSION=$(grep '^version =' pyproject.toml | cut -d '"' -f2)
-          echo "version=$PREV_VERSION" >> $GITHUB_OUTPUT
+          VERSION="$(git merge-base HEAD HEAD^):pyproject.toml" | grep '^version =' | cut -d '"' -f2"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Compare versions and create tag if changed
         if: steps.current.outputs.version != steps.previous.outputs.version
@@ -38,5 +37,6 @@ jobs:
           git config user.name "github-actions[bot]"
 
           TAG="v${{ steps.current.outputs.version }}"
+          echo "Creating tag $TAG"
           git tag "$TAG"
           git push origin "$TAG"

@@ -1,8 +1,7 @@
 [project]
 name = "mpyflow"
 version = "0.2.0"
-description = """mPyFlow is a library designed to manage
-multiprocessing workflows."""
+description = "mPyFlow is a library designed to manage multiprocessing workflows."
 readme = "README.md"
 authors = [
       { name = "Artur Lissin", email = "artdotlis@pm.me" },
@@ -19,8 +18,8 @@ package = true
 default-groups = []
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
@@ -174,17 +173,8 @@ show_missing = false
 fail_under = 0
 
 [tool.vulture]
-exclude = [
-    "mpyflow/shared/interfaces",
-    "mpyflow/shared/convert",
-    "mpyflow/shared/context/process"
-]
 ignore_decorators = ["@*",]
-ignore_names = [
-    "model_config",
-    "formatwarning",
-    "start_worker"
-]
+ignore_names = ["model_config","formatwarning"]
 make_whitelist = true
 min_confidence = 60
 paths = ["src"]

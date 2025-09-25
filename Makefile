@@ -29,7 +29,6 @@ docs: setup
 	$(UVE) sync --frozen --group docs
 
 setup:
-	git lfs install || echo '[FAIL] git-lfs could not be installed'
 	which uv || [ -d "${UV_INSTALL_DIR}" ] || (curl -LsSf https://astral.sh/uv/install.sh | sh -s - --quiet)
 	$(UVE) python install $(PYV)
 	rm -rf .venv

@@ -13,6 +13,10 @@ dependencies = [
   "rich ==14.1.0"
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mpyflow"]
+
 [tool.uv]
 package = true
 default-groups = []
@@ -139,6 +143,7 @@ requires = ["tox>=4.30"]
 
 [tool.tox.env_run_base]
 allowlist_externals = ["coverage"]
+set_env = { PYTHONPATH = "src" }
 commands = [
   [
     "coverage",
@@ -159,13 +164,11 @@ commands = [
   [
     "coverage",
     "report",
- ],
+  ],
 ]
 
 [tool.coverage.run]
-source = [
-  "src"
-]
+source = ["src/mpyflow"]
 parallel = true
 
 [tool.coverage.report]
@@ -173,10 +176,10 @@ show_missing = false
 fail_under = 0
 
 [tool.vulture]
+paths = ["configs/dev/whitelist.py", "src"]
 ignore_decorators = ["@*",]
 ignore_names = ["model_config","formatwarning"]
 make_whitelist = true
 min_confidence = 60
-paths = ["src"]
 sort_by_size = true
 verbose = false

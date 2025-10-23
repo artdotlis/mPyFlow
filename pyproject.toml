@@ -3,15 +3,11 @@ name = "mpyflow"
 version = "0.2.0"
 description = "mPyFlow is a library designed to manage multiprocessing workflows."
 readme = "README.md"
-authors = [
-      { name = "Artur Lissin", email = "artdotlis@pm.me" },
-]
+authors = [{ name = "Artur Lissin", email = "artdotlis@pm.me" }]
 license = "MIT"
 keywords = ["python", "skeleton"]
 requires-python = ">=3.13,<4"
-dependencies = [
-  "rich ==14.1.0"
-]
+dependencies = ["rich ==14.1.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -27,26 +23,22 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "commitizen ==4.9.1",
-    "mypy ==1.18.1",
-    "ruff ==0.13.0",
-    "black ==24.10.0",
-    "codespell ==2.4.1",
-    "shellcheck-py ==0.11.0.1",
-    "pre-commit-hooks ==5.0.0",
-    "vulture ==2.14",
-    # commit hooks
-    "lefthook ==1.13.1"
+  "commitizen ==4.9.1",
+  "mypy ==1.18.2",
+  "ruff ==0.13.1",
+  "black ==25.9.0",
+  "codespell ==2.4.1",
+  "shellcheck-py ==0.11.0.1",
+  "pre-commit-hooks ==6.0.0",
+  "vulture ==2.14",
+  # commit hooks
+  "lefthook ==1.13.3",
 ]
-test = [
-    "coverage ==7.10.6",
-    "pytest ==8.4.2",
-    "tox ==4.30.2",
-]
+test = ["coverage ==7.10.7", "pytest ==8.4.2", "tox ==4.30.2"]
 docs = [
   "mkdocs ==1.6.1",
   "mkdocs-material ==9.6.20",
-  "mkdocstrings ==0.30.0",
+  "mkdocstrings ==0.30.1",
   "mkdocstrings-python ==1.18.2",
 ]
 
@@ -65,9 +57,7 @@ major_version_zero = true
 name = "cz_conventional_commits"
 tag_format = "v$version"
 update_changelog_on_bump = true
-version_files = [
-  "README.md:^\\[!\\[release:",
-]
+version_files = ["README.md:^\\[!\\[release:"]
 version_provider = "uv"
 version_type = "semver"
 
@@ -88,12 +78,7 @@ disallow_subclassing_any = false
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
-exclude = [
-  "__pycache__",
-  "\\.tox",
-  "\\.mypy_cache",
-  "venv"
-]
+exclude = ["__pycache__", "\\.tox", "\\.mypy_cache", "venv"]
 ignore_missing_imports = true
 implicit_reexport = true
 local_partial_types = true
@@ -121,22 +106,84 @@ exclude = [
   "__pycache__",
   "build",
   "dist",
-  "venv"
+  "venv",
 ]
 
 [tool.ruff.lint]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
-ignore = ["TRY003", "N818"]
-select = ["E", "F", "B", "C90", "S", "PT", "ARG", "PTH", "TRY", "RUF", "N"]
+fixable = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "I",
+  "N",
+  "Q",
+  "S",
+  "T",
+  "W",
+  "ANN",
+  "ARG",
+  "BLE",
+  "COM",
+  "DJ",
+  "DTZ",
+  "EM",
+  "ERA",
+  "EXE",
+  "FBT",
+  "ICN",
+  "INP",
+  "ISC",
+  "NPY",
+  "PD",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "PYI",
+  "RET",
+  "RSE",
+  "RUF",
+  "SIM",
+  "SLF",
+  "TCH",
+  "TID",
+  "TRY",
+  "UP",
+  "YTT",
+]
+ignore = [
+  "TRY003",
+  "N818",
+  "D100",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D105",
+  "D106",
+  "D107",
+]
+select = ["E", "F", "B", "C90", "S", "PT", "ARG", "PTH", "TRY", "RUF", "N", "D"]
 unfixable = []
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = ["S101"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 11
 
 [tool.ruff.lint.pylint]
 max-args = 8
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.tox]
 requires = ["tox>=4.30"]

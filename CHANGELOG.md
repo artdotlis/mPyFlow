@@ -1,3 +1,13 @@
+## v0.3.0 (2026-02-18)
+
+### Feat
+
+- improve system build
+
+### Refactor
+
+- **dev**: update dev docker compose to use custom gitconfig path
+
 ## v0.2.0 (2025-09-23)
 
 ### Feat
